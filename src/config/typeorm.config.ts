@@ -13,4 +13,5 @@ export const typeOrmConfig = (
   database: configService.get('DATABASE_NAME'),
   ssl: true,
   entities: [join(__dirname) + '../../**/*.entity.{js,ts}'],
+  synchronize: true,
 });
