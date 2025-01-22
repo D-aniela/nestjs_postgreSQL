@@ -23,6 +23,9 @@ export class Product {
   @Column({ type: 'int' })
   stock: number;
 
+  /**
+   * eager: Si la relación se requiere en la consulta siempre, se cargará automáticamente.
+   */
   @ManyToOne(() => Category)
   category: Category;
 }
