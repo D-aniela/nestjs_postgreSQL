@@ -12,8 +12,8 @@ import {
   TransactionContents,
 } from './entities/transaction.entity';
 import { CreateTransactionDto } from './dto/create-transaction.dto';
-import { UpdateTransactionDto } from './dto/update-transaction.dto';
 import { Product } from 'src/products/entities/product.entity';
+import { CouponsService } from 'src/coupons/coupons.service';
 
 @Injectable()
 export class TransactionsService {
@@ -24,6 +24,8 @@ export class TransactionsService {
     private readonly transactionContentsRepository: Repository<TransactionContents>,
     @InjectRepository(Product)
     private readonly productRepository: Repository<Product>,
+
+    private readonly couponService: CouponsService,
   ) {}
 
   async create(createTransactionDto: CreateTransactionDto) {
@@ -36,16 +38,16 @@ export class TransactionsService {
         );
         transaction.total = total;
 
-        // if (createTransactionDto.coupon) {
-        //   const coupon = await this.couponService.applyCoupon(
-        //     createTransactionDto.coupon,
-        //   );
+        if (createTransactionDto.coupon) {
+          const coupon = await this.couponService.applyCoupon(
+            createTransactionDto.coupon,
+          );
 
-        //   const discount = (coupon.percentage / 100) * total;
-        //   transaction.discount = discount;
-        //   transaction.coupon = coupon.name;
-        //   transaction.total -= discount;
-        // }
+          const discount = (coupon.percentage / 100) * total;
+          transaction.discount = discount;
+          transaction.coupon = coupon.name;
+          transaction.total -= discount;
+        }
 
         for (const contents of createTransactionDto.contents) {
           const product = await transactionEntityManager.findOneBy(Product, {
